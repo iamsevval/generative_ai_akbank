@@ -43,7 +43,7 @@ Proje, profesyonel standartlara uygun olarak modüler bir yapıda geliştirilmi�
 
 ## Canlı Uygulama
 
-Akbank Generative AI Bootcamp kapsamında hazırlanan ilk versiyon (Pandas tabanlı) uygulamaya [buradan ulaşabilirsiniz](https://akbankgenerativeaibootcamp-lc2hnscvjeidlpmofpabtv.streamlit.app/).
+Akbank Generative AI Bootcamp kapsamında hazırlanan uygulamaya [buradan ulaşabilirsiniz](https://generative-ai-akbank.streamlit.app/).
 *(Not: Yeni LangChain/FAISS entegrasyonlu versiyon lokal çalışmaya uygun olarak güncellenmiştir.)*
 
 ---
