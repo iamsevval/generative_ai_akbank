@@ -70,7 +70,7 @@ def get_top_companies_chart(df, selected_field):
         title=f"🏢 {selected_field} Alanında En Çok İlan Açan Şirketler",
         labels={"Company": "Şirket", "Count": "İlan Sayısı"},
         color="Count",
-        color_continuous_scale="Orange"
+        color_continuous_scale="Oranges"
     )
     fig.update_layout(yaxis={'categoryorder':'total ascending'})
     return fig, df_field_jobs[["Job Title", "Company", "Salary"]].head(10)
