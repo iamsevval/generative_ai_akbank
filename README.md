@@ -1,4 +1,4 @@
-# 💼 Yazılım Kariyer Yol Haritası Chatbotu
+# 💼 Yazılım Kariyer Yol Haritası & Danışmanı (AI RAG Bot)
 
 ## Projenin Amacı
 Bu proje, kullanıcıların ilgilendiği yazılım alanına göre:
@@ -7,7 +7,7 @@ Bu proje, kullanıcıların ilgilendiği yazılım alanına göre:
 - Önerilen öğrenme yolları ve projeler,
 - Benzer kariyer alanları  
 
-bilgilerini sunan **RAG (Retrieval-Augmented Generation) tabanlı chatbot** geliştirmeyi amaçlamaktadır.
+bilgilerini sunan **Gerçek RAG (Retrieval-Augmented Generation) tabanlı bir Yapay Zeka Kariyer Danışmanı** geliştirmeyi amaçlamaktadır. Proje kapsamında veriler LangChain ve FAISS kullanılarak vektörel olarak işlenmektedir.
 
 ---
 
@@ -25,22 +25,42 @@ Projede kullanılan veri setleri hazır veri setleridir:
 
 ---
 
-## Kullanılan Yöntemler
-- **Web Arayüzü:** Streamlit
-- **Veri İşleme:** Pandas
-- **RAG Pipeline:** FAISS + LangChain
-- **Dil Modeli:** OpenAI GPT-4 API
+## Kullanılan Teknolojiler ve Mimari
+Proje, profesyonel standartlara uygun olarak modüler bir yapıda geliştirilmiştir:
+- **Web Arayüzü:** Streamlit (`st.chat_message` bileşenleri ve Sekmeler (Tabs))
+- **Veri İşleme ve Görselleştirme:** Pandas ve **Plotly** (İnteraktif grafikler için)
+- **RAG Pipeline:** LangChain (RecursiveCharacterTextSplitter, StuffDocumentsChain)
+- **Vektör Veritabanı:** FAISS
+- **Dil Modeli & Embeddings:** OpenAI GPT-4o-mini ve OpenAI Embeddings
+
+### Proje Modülleri
+- `app.py`: Ana arayüz ve sohbet akışını yönetir.
+- `rag_engine.py`: FAISS vektör veritabanını oluşturur ve Retriever zincirini kurgular.
+- `data_processing.py`: Verileri CSV'den okuyup Plotly ile görselleştirir.
+- `prompts.py`: Yapay zeka sisteminin kişilik (danışman) rolünü barındırır.
 
 ---
 
-## Çözüm Mimarisi
-**RAG (Retrieval-Augmented Generation) Mimarisi:**
-
-1. **Retriever (Bilgi Getirici):** CSV verilerinden embedding’ler oluşturulur, FAISS vektör veritabanında saklanır.
-2. **LLM (Cevap Üretici):** GPT-4 modeli, kullanıcı sorusunu ve retriever’dan gelen verileri kullanarak cevap üretir.
-3. **Frontend (Sunum Katmanı):** Streamlit arayüzü, kullanıcı ile etkileşimi sağlar.
-
-
 ## Canlı Uygulama
 
-Akbank Generative AI Bootcamp kapsamında hazırlanan uygulamaya [buradan ulaşabilirsiniz](https://akbankgenerativeaibootcamp-lc2hnscvjeidlpmofpabtv.streamlit.app/).
+Akbank Generative AI Bootcamp kapsamında hazırlanan ilk versiyon (Pandas tabanlı) uygulamaya [buradan ulaşabilirsiniz](https://akbankgenerativeaibootcamp-lc2hnscvjeidlpmofpabtv.streamlit.app/).
+*(Not: Yeni LangChain/FAISS entegrasyonlu versiyon lokal çalışmaya uygun olarak güncellenmiştir.)*
+
+---
+
+## Nasıl Çalıştırılır?
+
+1. Kütüphaneleri kurun:
+```bash
+pip install -r requirements.txt
+```
+
+2. `.env` dosyasını oluşturup API anahtarınızı ekleyin:
+```
+OPENAI_API_KEY="sk-proj-..."
+```
+
+3. Uygulamayı başlatın:
+```bash
+streamlit run app.py
+```

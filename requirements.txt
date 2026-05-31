@@ -1,7 +1,11 @@
 streamlit
 pandas
 matplotlib
+plotly
 openai
 faiss-cpu
 langchain
+langchain-openai
+langchain-community
 python-dotenv
+tiktoken
