@@ -1,7 +1,7 @@
 import os
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -12,11 +12,12 @@ from data_processing import load_data, get_career_paths
 
 class RAGEngine:
     def __init__(self):
-        self.embeddings = OpenAIEmbeddings()
         self.vector_store_path = "faiss_index"
         self.vector_store = None
         self.retriever = None
-        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+        # OpenAI yerine tamamen ücretsiz Google Gemini modelleri kullanılıyor
+        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.7)
         self.chain = None
         
     def prepare_documents(self):

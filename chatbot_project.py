@@ -23,12 +23,12 @@ def get_cached_data():
     return load_data()
 
 try:
-    if not os.getenv("OPENAI_API_KEY") and not st.secrets.get("OPENAI_API_KEY"):
-         st.error("🚨 OPENAI_API_KEY bulunamadı. Lütfen .env veya Streamlit Secrets'e ekleyin.")
+    if not os.getenv("GOOGLE_API_KEY") and not st.secrets.get("GOOGLE_API_KEY"):
+         st.error("🚨 GOOGLE_API_KEY bulunamadı. Lütfen .env veya Streamlit Secrets'e ekleyin.")
          st.stop()
 except Exception:
-    if not os.getenv("OPENAI_API_KEY"):
-         st.error("🚨 OPENAI_API_KEY bulunamadı. Lütfen .env dosyasına ekleyin.")
+    if not os.getenv("GOOGLE_API_KEY"):
+         st.error("🚨 GOOGLE_API_KEY bulunamadı. Lütfen .env dosyasına ekleyin.")
          st.stop()
 
 rag_engine = get_rag_engine()
