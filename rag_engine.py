@@ -29,7 +29,7 @@ class RAGEngine:
             model_name="all-MiniLM-L6-v2"
         )
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-pro", 
+            model="gemini-1.5-flash", 
             temperature=0.7,
             google_api_key=api_key
         )
