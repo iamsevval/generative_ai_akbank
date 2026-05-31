@@ -46,8 +46,8 @@ class RAGEngine:
         salary_combined = pd.concat([df_salary_basic, df_salary_extra], ignore_index=True)
         
         if not salary_combined.empty:
-            # Eksik sütunları engellemek için dict yapısı
-            for _, row in salary_combined.iterrows():
+            # Sadece örneklem (hızlı açılış için) al
+            for _, row in salary_combined.head(50).iterrows():
                 title = row.get("Job Title", "Bilinmiyor")
                 company = row.get("Company Name", "Bilinmiyor")
                 salary = row.get("Salary", "Bilinmiyor")
@@ -60,14 +60,15 @@ class RAGEngine:
         jobs_combined = pd.concat([df_jobs, df_postings], ignore_index=True)
         
         if not jobs_combined.empty:
-            for _, row in jobs_combined.iterrows():
+            # Sadece örneklem al
+            for _, row in jobs_combined.head(50).iterrows():
                 title = row.get("Job Title", row.get("job_title", "Bilinmiyor"))
                 company = row.get("Company", row.get("company", "Bilinmiyor"))
                 salary = row.get("Salary", "Bilinmiyor")
                 text = f"İş İlanı Pozisyonu: {title}. İlan Veren Şirket: {company}. Beklenen Maaş: {salary}."
                 documents.append(text)
                 
-        # Kariyer Yolu Bilgilerini de Vektöre Ekle
+        # Kariyer Yolu Bilgilerini de Vektöre Ekle (HEPSİ)
         career_paths = get_career_paths()
         for field, data in career_paths.items():
             learning = ", ".join(data["Learning_Path"])
@@ -75,10 +76,6 @@ class RAGEngine:
             similar = ", ".join(data["Similar_Fields"])
             text = f"{field} yazılım alanı kariyer yolu: Öğrenilmesi gerekenler; {learning}. Yapılabilecek örnek projeler; {projects}. Benzer alanlar; {similar}."
             documents.append(text)
-
-        # Eğer çok büyükse sadece ilk 1000 satırı al (Performans için opsiyonel)
-        if len(documents) > 2000:
-            documents = documents[:2000]
 
         return documents
 
