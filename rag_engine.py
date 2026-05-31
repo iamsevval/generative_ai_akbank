@@ -1,7 +1,8 @@
 import os
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_community.vectorstores import FAISS
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -23,10 +24,9 @@ class RAGEngine:
             except Exception:
                 pass
                 
-        # OpenAI yerine tamamen ücretsiz Google Gemini modelleri kullanılıyor
-        self.embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/text-embedding-004", 
-            google_api_key=api_key
+        # Google Embeddings API kısıtlamalarını aşmak için lokal HuggingFace embeddings kullanılıyor
+        self.embeddings = HuggingFaceEmbeddings(
+            model_name="all-MiniLM-L6-v2"
         )
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-1.5-flash", 
