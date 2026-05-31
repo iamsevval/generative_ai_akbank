@@ -117,9 +117,15 @@ class RAGEngine:
         if not self.chain:
             return "Hata: RAG sistemi başlatılamadı."
             
-        response = self.chain.invoke({
-            "input": question,
-            "question": question,
-            "chat_history": chat_history
-        })
-        return response["answer"]
+        try:
+            response = self.chain.invoke({
+                "input": question,
+                "question": question,
+                "chat_history": chat_history
+            })
+            return response["answer"]
+        except Exception as e:
+            error_msg = str(e)
+            if "ResourceExhausted" in error_msg or "429" in error_msg:
+                return "⚠️ **Google API Limiti Aşıldı!** Ücretsiz API kotanız (dakika/gün başına) dolduğu için şu an cevap veremiyorum. Lütfen 1-2 dakika bekleyip tekrar deneyin."
+            return f"⚠️ **Sistem Hatası:** Yapay zeka ile iletişim kurulamadı. Lütfen daha sonra tekrar deneyin.\n\nDetay: {error_msg}"
