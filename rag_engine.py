@@ -15,9 +15,24 @@ class RAGEngine:
         self.vector_store_path = "faiss_index"
         self.vector_store = None
         self.retriever = None
+        import streamlit as st
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key and hasattr(st, "secrets"):
+            try:
+                api_key = st.secrets.get("GOOGLE_API_KEY")
+            except Exception:
+                pass
+                
         # OpenAI yerine tamamen ücretsiz Google Gemini modelleri kullanılıyor
-        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.7)
+        self.embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/text-embedding-004", 
+            google_api_key=api_key
+        )
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash", 
+            temperature=0.7,
+            google_api_key=api_key
+        )
         self.chain = None
         
     def prepare_documents(self):
