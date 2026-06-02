@@ -17,10 +17,10 @@ class RAGEngine:
         self.vector_store = None
         self.retriever = None
         import streamlit as st
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key and hasattr(st, "secrets"):
+        self.api_key = os.getenv("GOOGLE_API_KEY")
+        if not self.api_key and hasattr(st, "secrets"):
             try:
-                api_key = st.secrets.get("GOOGLE_API_KEY")
+                self.api_key = st.secrets.get("GOOGLE_API_KEY")
             except Exception:
                 pass
                 
@@ -28,12 +28,22 @@ class RAGEngine:
         self.embeddings = HuggingFaceEmbeddings(
             model_name="all-MiniLM-L6-v2"
         )
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash", 
-            temperature=0.7,
-            google_api_key=api_key
-        )
+        
+        # Fallback mekanizması için güncel model listesi
+        self.models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]
+        self.current_model_index = 0
         self.chain = None
+        self._initialize_llm()
+
+    def _initialize_llm(self):
+        """Mevcut model indexine göre LLM'i başlatır"""
+        self.llm = ChatGoogleGenerativeAI(
+            model=self.models[self.current_model_index], 
+            temperature=0.7,
+            google_api_key=self.api_key
+        )
+        if self.retriever:
+            self._setup_chain()
         
     def prepare_documents(self):
         """CSV verilerini metin belgelerine dönüştürür"""
@@ -113,19 +123,29 @@ class RAGEngine:
         self.chain = create_retrieval_chain(self.retriever, question_answer_chain)
 
     def get_answer(self, question, chat_history=""):
-        """Soruyu yanıtlar"""
+        """Soruyu yanıtlar (Fallback mekanizması ile)"""
         if not self.chain:
             return "Hata: RAG sistemi başlatılamadı."
             
-        try:
-            response = self.chain.invoke({
-                "input": question,
-                "question": question,
-                "chat_history": chat_history
-            })
-            return response["answer"]
-        except Exception as e:
-            error_msg = str(e)
-            if "ResourceExhausted" in error_msg or "429" in error_msg:
-                return "⚠️ **Google API Limiti Aşıldı!** Ücretsiz API kotanız (dakika/gün başına) dolduğu için şu an cevap veremiyorum. Lütfen 1-2 dakika bekleyip tekrar deneyin."
-            return f"⚠️ **Sistem Hatası:** Yapay zeka ile iletişim kurulamadı. Lütfen daha sonra tekrar deneyin.\n\nDetay: {error_msg}"
+        while self.current_model_index < len(self.models):
+            try:
+                response = self.chain.invoke({
+                    "input": question,
+                    "question": question,
+                    "chat_history": chat_history
+                })
+                return response["answer"]
+            except Exception as e:
+                error_msg = str(e)
+                # Sadece 404 (Model Not Found) veya 429 (Quota Exceeded) hatalarında diğer modele geç
+                if "404" in error_msg or "429" in error_msg or "ResourceExhausted" in error_msg:
+                    self.current_model_index += 1
+                    if self.current_model_index < len(self.models):
+                        print(f"Model hatası/limiti, yeni modele geçiliyor: {self.models[self.current_model_index]}")
+                        self._initialize_llm()
+                        continue
+                    else:
+                        self.current_model_index = 0 # Başa sar
+                        self._initialize_llm()
+                        return "⚠️ **Google API Hatası:** Kullanılabilir tüm Gemini modellerini (1.5 Flash, 1.5 Pro, Gemini Pro vb.) denedim ancak API anahtarınız bu modellerden hiçbirine yetki vermiyor veya ücretsiz kotanız tamamen dolmuş. Lütfen https://aistudio.google.com/app/apikey adresinden yeni bir proje seçerek sıfırdan bir anahtar oluşturun."
+                return f"⚠️ **Sistem Hatası:** Yapay zeka ile iletişim kurulamadı. Lütfen daha sonra tekrar deneyin.\n\nDetay: {error_msg}"
